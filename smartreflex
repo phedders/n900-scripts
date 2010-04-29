@@ -1,0 +1,13 @@
+#!/bin/sh
+
+[ $(id -u) -eq 0 ] || exec sudo $0 "$@"
+
+if ([ "$1" = "off" -o "$1" = "0" ]); then
+echo "0" >/sys/power/sr_vdd2_autocomp
+echo "0" >/sys/power/sr_vdd1_autocomp
+elif ([ "$1" = "on" -o "$1" = "1" ]); then
+echo "1" >/sys/power/sr_vdd2_autocomp
+echo "1" >/sys/power/sr_vdd1_autocomp
+fi
+echo /sys/power/sr_vdd2_autocomp = $(cat /sys/power/sr_vdd2_autocomp)
+echo /sys/power/sr_vdd1_autocomp = $(cat /sys/power/sr_vdd1_autocomp)
