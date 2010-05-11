@@ -1,0 +1,9 @@
+#!/bin/sh
+exec >> /home/user/xxx
+echo net-connect $(date) $@
+
+until ip ro | grep default ; do echo no default route yet...; sleep 1; done
+ip r a $(ip r|sed -ne "s/default/212.13.216.0\/24/p") >> /home/user/xxx
+ps -ef|grep openvpn || (cd /etc/openvpn; openvpn --config cli* --daemon;)
+#killall -USR1 openvpn
+#/home/user/.ovpn/ovpn-tramp-up&
