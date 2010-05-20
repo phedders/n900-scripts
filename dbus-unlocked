@@ -1,0 +1,47 @@
+#!/bin/sh
+echo $(date) >> /home/user/xxx
+echo $0 $@ >> /home/user/xxx
+[ $(id -u) -eq 0 ] || exec sudo $0 "$@"
+exec >> /home/user/xxx 2>&1
+
+echo ondemand > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+
+check_temp() {
+  TEMP=`cat /sys/class/power_supply/bq27200-0/temp`
+  X=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq)
+  N=$(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq)
+  if ([ $TEMP -gt 40 -o "x$1" = "xs" ]); then
+    echo "TEMP is over 40 ($TEMP) MAX is $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq)"
+    unset Q; for q in $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies); do
+      [ $Q ] && echo REDUCING MAX to $q && \
+        echo $q > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq && \
+        gap=30 && break
+      [ $q = $X ] && Q=true
+    done
+  elif ([ $TEMP -lt 39 -o "x$1" = "xf" ]); then
+    echo "TEMP is under 39 ($TEMP) MAX is $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq)"
+    unset Q; for q in $(cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies); do
+echo $q ... $Q ... $X
+      [ "x$q" = "x$X" -a $Q ] && echo Increasing MAX to $Q && \
+        echo $N > /sys/devices/system/cpu/cpu0/cpufreq/scaling_min_freq && \
+        echo $Q > /sys/devices/system/cpu/cpu0/cpufreq/scaling_max_freq && \
+        gap=30 && break
+      Q=$q
+    done
+  fi
+/home/user/.bin/tempandspeed
+}
+
+#check_temp "$@"
+if ([ "$4" != "tklock_mode_ind" ]); then check_temp; exit $?; fi
+
+[ -f /tmp/check_temp ] && exit 0
+echo $$ > /tmp/check_temp; sleep 1
+grep ^$$$ /tmp/check_temp || exit 0
+echo Starting loop as pid $$
+while :; do
+  gap=60
+  check_temp
+  sleep $gap
+done
+

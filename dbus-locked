@@ -1,0 +1,12 @@
+#!/bin/sh
+echo $(date) >> /home/user/xxx
+echo $0 $@ >> /home/user/xxx
+[ $(id -u) -eq 0 ] || exec sudo $0 "$@"
+
+echo powersave > /sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+kernel-config limits 125 250
+
+if ([ -f /tmp/check_temp ]); then
+  kill -9 $(cat /tmp/check_temp)
+  rm -f /tmp/check_temp
+fi
