@@ -8,5 +8,5 @@ kernel-config limits 125 250
 
 if ([ -f /tmp/check_temp ]); then
   kill -9 $(cat /tmp/check_temp)
-  rm -f /tmp/check_temp
+  ps $(cat /tmp/check_temp) 2>/dev/null || rm -f /tmp/check_temp
 fi
