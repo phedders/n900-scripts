@@ -1,0 +1,5 @@
+#!/bin/sh
+source $(dirname $0)/ds-common
+all2log
+
+ifup -f bnep0
