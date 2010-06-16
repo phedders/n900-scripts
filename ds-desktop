@@ -1,0 +1,6 @@
+#!/bin/sh
+source $(dirname $0)/ds-common
+all2log
+
+echo 16  >/proc/sys/kernel/pty/max
+/home/user/.pbin/fw
