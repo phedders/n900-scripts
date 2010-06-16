@@ -1,0 +1,35 @@
+#!/bin/sh
+log() { echo ${prog} $(date +%F_%T) "$@" >> /home/user/xxx; }
+fail() { err=$1; log Error "${@}"; exit $err; }
+all2log() { exec >> /home/user/xxx 2>&1; }
+prog=$(basename $0)
+progdir=$(cd `dirname $0`;pwd); d=$progdir
+pid=$$
+[ "$prog" = "ds-common" ] && { echo Do not run ds-common directly; exit 99; }
+[ $(id -u) -eq 0 ] || exec sudo ${progdir}/$prog "$@"
+log Started $@
+
+loop() {
+[ "$1" != "LOOP" ] && { nohup "$0" LOOP& exit 0; }
+  delay=$(1:=60}
+  get_lock $2
+  log going loopy pid=${pid}
+  while :; do
+    test_lock $LOCKFILE
+    loop_core
+    gap=60
+    sleep $gap
+  done
+}
+
+get_lock() {
+  [ "x$LOCKFILE" = "x" ] && LOCKFILE=${1:=/tmp/$prog.lock}
+  [ -f "$LOCKFILE" ] && { log Lockfile already exists - exiting; exit 0; }
+  echo $progdir/$prog $$ > $LOCKFILE; sleep 1
+  grep " ${pid}$" $LOCKFILE || { log Someone else got the lock before me; exit 0; }
+}
+
+test_lock() {
+  [ "x$LOCKFILE" = "x" ] && LOCKFILE=${1:=/tmp/$prog.lock}
+  [ -f "$LOCKFILE" ] || { log My lock file vanished... pid=${pid}; exit 0; }
+}
