@@ -1,0 +1,45 @@
+# Example of dbus-scripts control file
+#
+# Each line of these files represents a filter to call a script.
+# Tokens are separated by white space.
+# First token on line is the script to execute.
+# Subsequent tokens are filters to match arguments from dbus message.
+# Filters are matched like shell wildcards (using fnmatch(3)).
+# If a filter is specified (even if it is *), the corresponding argument
+# must be present in order to get a match.
+#
+# First argument is sender
+# Second argument is destination
+# For SIGNAL and METHOD_CALL, third argument is interface
+# For SIGNAL and METHOD_CALL, fourth argument is member
+# Other arguments depend on the message
+#
+# Example: to act on WLAN interface state changes use:
+#/some/script * * com.nokia.icd status_changed * WLAN_INFRA
+# In /some/script, $5 will be the interface name and $7 the new state (IDLE, CONNECTED, etc.)
+
+#/home/user/scripts-dbus-bnep * * org.kernel.class.net.bnep0 add
+
+#signal sender=:1.91 -> dest=(null destination) serial=56 path=/org/kernel/class/net/bnep0; interface=org.kernel.kevent; member=remove
+#signal sender=:1.91 -> dest=(null destination) serial=59 path=/org/kernel/class/net/bnep0; interface=org.kernel.kevent; member=add
+
+#signal sender=:1.11 -> dest=(null destination) serial=960 path=/org/freedesktop/Hal/Manager; interface=org.freedesktop.Hal.Manager; member=DeviceAdded
+#   string "/org/freedesktop/Hal/devices/net_ec_9b_5b_1a_78_48"
+
+#/home/user/.bin/dbus-bnep * * org.kernel.kevent add
+#FOO/home/user/.bin/dbus-log * * *
+
+# com.nokia.bme.signal charger_disconnected
+# com.nokia.bme.signal charger_connected
+# com.nokia.bme.signal charger_charging_on
+#/home/user/.bin/dbus-bme-signal * * com.nokia.bme.signal
+
+/home/user/.bin/ds-bnep * * org.freedesktop.Hal.Manager DeviceAdded /org/freedesktop/Hal/devices/net_ec_9b_5b_1a_78_48
+/home/user/.bin/ds-desktop * * com.nokia.HildonDesktop ready
+/home/user/.bin/ds-locked * * com.nokia.mce.signal tklock_mode_ind locked
+/home/user/.bin/ds-unlocked * * com.nokia.mce.signal tklock_mode_ind unlocked
+/home/user/.bin/ds-net-connect * * com.nokia.csd.GPRS.Context Connected
+/home/user/.bin/ds-net-connect * * com.nokia.wlancond.signal connected
+/home/user/.bin/ds-charger_connected * * com.nokia.bme.signal charger_connected
+/home/user/.bin/ds-charger_disconnected * * com.nokia.bme.signal charger_disconnected
+
