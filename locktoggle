@@ -1,0 +1,4 @@
+#!/bin/sh
+#[ $(id -u) -eq 0 ] || exec sudo ${progdir}/$prog "$@"
+dbus-send --system --type=method_call --dest=com.nokia.mce /com/nokia/mce/request com.nokia.mce.request.req_tklock_mode_change string:"locked" | echo ""
+
