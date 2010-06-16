@@ -10,10 +10,10 @@ pid=$$
 log Started $@
 
 while [ $@ ]; do
-  log checking $1
   if ([ "$1" = "LOOP" ]); then
     loop_mode=true; log Will go into loop_mode
   fi
+  type -t args_core && args_core
   shift
 done
 
@@ -31,13 +31,12 @@ loop() {
 }
 
 get_lock() {
-  [ "x$LOCKFILE" = "x" ] && LOCKFILE=/tmp/$prog.lock
+  [ "x$LOCKFILE" = "x" ] && LOCKFILE=${1:-/tmp/$prog.lock}
   [ -f "$LOCKFILE" ] && { log Lockfile already exists - exiting; exit 0; }
   echo $progdir/$prog $$ > $LOCKFILE; sleep 1
-  grep " ${pid}$" $LOCKFILE || { log Someone else got the lock before me; exit 0; }
+  grep -q " ${pid}$" $LOCKFILE || { log Someone else got the lock before me; exit 0; }
 }
 
 test_lock() {
-  [ "x$LOCKFILE" = "x" ] && LOCKFILE=/tmp/$prog.lock
-  [ -f "$LOCKFILE" ] || { log My lock file vanished... pid=${pid}; exit 0; }
+  grep -q " ${pid}$" $LOCKFILE 2>/dev/null || { log My log has vanished or been stollen; exit 0; }
 }
