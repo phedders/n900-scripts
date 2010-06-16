@@ -9,27 +9,35 @@ pid=$$
 [ $(id -u) -eq 0 ] || exec sudo ${progdir}/$prog "$@"
 log Started $@
 
+while [ $@ ]; do
+  log checking $1
+  if ([ "$1" = "LOOP" ]); then
+    loop_mode=true; log Will go into loop_mode
+  fi
+  shift
+done
+
+loop_delay=60
 loop() {
-[ "$1" != "LOOP" ] && { nohup "$0" LOOP& exit 0; }
-  delay=$(1:=60}
+  [ $loop_mode ] || { nohup "$0" LOOP& exit 0; }
   get_lock $2
   log going loopy pid=${pid}
   while :; do
     test_lock $LOCKFILE
     loop_core
-    gap=60
+    gap=$loop_delay
     sleep $gap
   done
 }
 
 get_lock() {
-  [ "x$LOCKFILE" = "x" ] && LOCKFILE=${1:=/tmp/$prog.lock}
+  [ "x$LOCKFILE" = "x" ] && LOCKFILE=/tmp/$prog.lock
   [ -f "$LOCKFILE" ] && { log Lockfile already exists - exiting; exit 0; }
   echo $progdir/$prog $$ > $LOCKFILE; sleep 1
   grep " ${pid}$" $LOCKFILE || { log Someone else got the lock before me; exit 0; }
 }
 
 test_lock() {
-  [ "x$LOCKFILE" = "x" ] && LOCKFILE=${1:=/tmp/$prog.lock}
+  [ "x$LOCKFILE" = "x" ] && LOCKFILE=/tmp/$prog.lock
   [ -f "$LOCKFILE" ] || { log My lock file vanished... pid=${pid}; exit 0; }
 }
