@@ -1,0 +1,10 @@
+#!/bin/sh
+
+[ $(id -u) -eq 0 ] || exec sudo $0 "$@"
+
+if lsmod|grep -vq bq27x00_battery ; then
+  cmd="modprobe bq27x00_battery"
+  [ $(id -u) -eq 0 ] || cmd="sudo $cmd"
+  $cmd
+fi
+echo `cat /sys/class/power_supply/bq27200-0/temp` °C 
