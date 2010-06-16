@@ -1,0 +1,34 @@
+#!/bin/sh
+
+unset SSH_AUTH_SOCK
+unset SSH_AGENT_PID
+
+agentfile="/home/user/.a"
+
+source_agent() {
+  if [[ -f ${agentfile} ]]; then
+          source ${agentfile} >> /dev/null
+  fi
+  ssh-add -l
+}
+
+start_agent() {
+  pkill ssh-agent
+  ssh-agent -t $((24*60*60)) > ${agentfile}
+  source_agent
+}
+  
+load_keys() {
+  ssh-add
+}
+
+source_agent; x=$?
+echo $x
+[ $x -eq 2 ] && start_agent; x=$?
+echo $x
+[ $x -eq 1 ] && load_keys
+
+
+#alias idlist="ssh-add -l"
+#alias idrsa="ssh-add /home/user/.ssh/id_rsa"
+#alias idrsadel="ssh-add -d /home/user/.ssh/id_rsa"
