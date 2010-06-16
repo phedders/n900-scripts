@@ -1,0 +1,7 @@
+#!/bin/sh
+
+if /usr/share/lfocus/v4l2-ctl -C torch_intensity |grep -q " 0$"; then
+  /usr/share/lfocus/v4l2-ctl -c torch_intensity=1
+else
+  /usr/share/lfocus/v4l2-ctl -c torch_intensity=0
+fi
