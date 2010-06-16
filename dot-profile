@@ -1,0 +1,6 @@
+export PATH=/home/user/.bin:/home/user/.pbin:$PATH
+
+alias a="source ssh-agent-setup"
+alias ping="s ping"
+alias kc=/usr/sbin/kernel-config
+alias ssh="a;ssh"
