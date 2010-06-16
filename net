@@ -1,0 +1,27 @@
+#!/bin/sh
+#see http://wiki.maemo.org/Desktop_Command_Execution_Widget_scripts
+one=$1
+source $(dirname $0)/ds-common
+
+off() {
+  dbus-send --system --dest=com.nokia.icd /com/nokia/icd_ui com.nokia.icd_ui.disconnect boolean:true | echo -n ""
+  echo network turned off
+}
+any() {
+  dbus-send --system --type=method_call --dest=com.nokia.icd /com/nokia/icd com.nokia.icd.connect string:"[ANY]" uint32:0 | echo -n ""
+  echo any network connection turned on
+}
+toggle() {
+if ip ro | grep -q ^default; then
+off
+else
+any
+fi
+}
+
+if ([ "x$one" = "x" -o "$one" = "tog" -o "$one" = "t" -o "$one" = "toggle" ]); then
+  toggle
+elif ([ "$one" = "on" ]); then any
+else
+  $one || echo Sorry no such command
+fi
