@@ -1,0 +1,13 @@
+#!/bin/sh
+source $(dirname $0)/ds-common
+all2log
+
+( sleep 5; /home/user/.bin/sony; )&
+
+loop_core() { :; }
+
+loop_delay=60
+loop
+
+# not sure what this was for
+#[ -d $(cat /tmp/plugged_in) ] || rm /tmp/plugged_in

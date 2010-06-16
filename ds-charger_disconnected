@@ -1,0 +1,7 @@
+#!/bin/sh
+source $(dirname $0)/ds-common
+all2log
+
+[ -f /tmp/ds-charger_connected.lock ] && rm -f /tmp/ds-charger_connected.lock
+dbus-send --system --type=method_call --dest=com.nokia.mce /com/nokia/mce/request com.nokia.mce.request.req_tklock_mode_change string:"locked" | echo ""
+
