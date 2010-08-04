@@ -1,0 +1,14 @@
+#!/bin/sh
+
+ON() { sudo debian su - root -c "swapon -p5 /dev/mmcblk1p4"; }
+OFF() { sudo debian su - root -c "swapoff /dev/mmcblk1p4"; }
+TOGGLE() { grep -q mmcblk1 /proc/swaps && OFF || ON; }
+MOVE() { sudo swapoff /dev/mmcblk0p3; sudo swapon /dev/mmcblk0p3; }
+SHOW() { cat /proc/swaps; }
+
+if ([ "$1" = "on" ]); then ON
+elif ([ "$1" = "off" ]); then OFF
+elif ([ "$1" = "t" ]); then TOGGLE
+elif ([ "$1" = "m" ]); then MOVE
+fi
+SHOW
