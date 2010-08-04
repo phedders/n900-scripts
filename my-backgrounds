@@ -1,0 +1,17 @@
+#!/bin/sh
+Gg() { echo "$(gconftool -T $1) ${1} $(gconftool -g $1)"; }
+Gs() { gconftool -t $1 -s $2 $3; }
+Gu() { Gg $2; Gs $1 $2 $3; }
+
+#Gu string /apps/osso/hildon-desktop/views/1/bg-image /media/mmc1/output/20100529/20100529-205600.jpg
+#Gu string /apps/osso/hildon-desktop/views/2/bg-image /media/mmc1/output/20100525/20100525-081521.jpg
+#Gu string /apps/osso/hildon-desktop/views/3/bg-image /media/mmc1/output/20100525/20100525-152849.jpg
+#Gu string /apps/osso/hildon-desktop/views/4/bg-image /media/mmc1/output/20100528/20100528-140128..jpg
+
+I() { convert -sample 800x480 ${2} /home/user/.backgrounds/background-${1}.png; }
+
+I 1 /media/mmc1/output/20100529/20100529-205600.jpg
+I 2 /media/mmc1/output/20100525/20100525-081521.jpg
+I 3 /media/mmc1/output/20100525/20100525-152849.jpg
+I 4 /media/mmc1/output/20100528/20100528-140128..jpg
+
