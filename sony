@@ -1,0 +1,12 @@
+#!/bin/sh
+# May need to : dbus-send --print-reply --system --dest=org.bluez / org.bluez.Manager.DefaultAdapter
+# | sed -ne "s/^.*object path //p"
+# then : dbus-send --print-reply --system --dest=org.bluez /org/bluez/4189/hci0 org.bluez.Adapter.FindDevice string:00:15:0E:A0:6C:C8
+
+devid=$(grep -ir "be ford audio$" /var/lib/bluetooth/*/names|awk '{print $1}')
+
+adapter=$(dbus-send --print-reply --system --dest=org.bluez / org.bluez.Manager.DefaultAdapter |\
+  sed -ne "s/^.*object path //p"|sed -e 's/"//g')
+device=$(dbus-send --print-reply --system --dest=org.bluez ${adapter} org.bluez.Adapter.FindDevice string:${devid} |\
+  sed -ne "s/^.*object path //p"|sed -e 's/"//g')
+dbus-send --system --print-reply --type=method_call --dest=org.bluez ${device} org.bluez.AudioSink.Connect
