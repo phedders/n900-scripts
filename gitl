@@ -1,0 +1,24 @@
+#!/bin/bash
+GIT=gitr
+
+# Find root by .gitlink
+
+ODIR=`pwd`
+unset GIT_WORK_TREE GIT_DIR
+while [ "x$(pwd)" != "x/" ]; do
+  if ([ -d ".git" ]); then
+    cd $ODIR
+    exec $GIT "$@"
+    break
+  elif ([ -f ".gitlink" ]); then
+    export GIT_WORK_TREE=$(pwd)
+    export GIT_DIR=$(cat ${GIT_WORK_TREE}/.gitlink)
+    [ "x$GIT_DIR" = "x" ] || exec $GIT "$@"
+    break
+  else
+    cd ..
+  fi
+done
+
+echo "Sorry - no gitlinked working directory found"
+
